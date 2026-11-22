@@ -336,8 +336,8 @@ private fun Composer(
             justOpened = false
         }
     }
-    Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).padding(start = 4.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        BarAction(Icons.Attach, "Attach", onAttach)
+    Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        // The field starts at the screen edge, so its cursor sits where it does in Messages.
         Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
             TextFieldMMD(
                 value = draft,
@@ -363,6 +363,7 @@ private fun Composer(
             if (justOpened && !focused && draft.isEmpty()) DrawnCursor()
         }
         // An empty field offers a voice note instead, as Signal does.
+        BarAction(Icons.Attach, "Attach", onAttach)
         if (draft.isEmpty()) SquareButton(Icons.Mic, "Record voice note", onRecord) else SquareButton(Icons.Send, "Send", send)
     }
 }

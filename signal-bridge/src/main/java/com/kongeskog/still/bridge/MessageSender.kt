@@ -5,6 +5,7 @@ import com.kongeskog.still.bridge.db.AttachmentRow
 import com.kongeskog.still.bridge.db.MessageRow
 import com.kongeskog.still.bridge.db.SendLogRow
 import org.signal.libsignal.zkgroup.groups.GroupSecretParams
+import org.whispersystems.signalservice.api.push.exceptions.RateLimitException
 import org.whispersystems.signalservice.api.messages.SendMessageResult
 import org.whispersystems.signalservice.internal.push.Content
 import org.whispersystems.signalservice.api.crypto.AttachmentCipherStreamUtil
@@ -68,7 +69,21 @@ internal class SendQueue(
     /** The user removed the switch that used to gate this (2026-11-21): Still sends like any Signal app. */
     private val contactsAllowed = true
 
+    /** Seconds the server asked us to hold off, from its last "too many requests" answer. */
+    private var askedToWait = 0L
+
     fun kick() { executor.execute(::drain) }
+
+    /**
+     * True when the server said "too many requests" (429): the message is fine and goes out
+     * later, so it stays queued instead of being marked as not sent.
+     */
+    private fun slowDown(e: NonSuccessfulResponseCodeException): Boolean {
+        if (e.code != 429) return false
+        val asked = (e as? RateLimitException)?.retryAfterMilliseconds?.orElse(null) ?: 0L
+        askedToWait = (asked / 1000 + 1).coerceIn(30, 3600)
+        return true
+    }
 
     private fun drain() {
         dao.failOldSends(System.currentTimeMillis() - GIVE_UP_AFTER)
@@ -80,7 +95,7 @@ internal class SendQueue(
                 if (thread == null) MessageRow.STATUS_FAILED else deliver(thread, text(row))
             } catch (e: NonSuccessfulResponseCodeException) {
                 Log.w(TAG, "Send refused: ${e.code}")
-                MessageRow.STATUS_FAILED
+                if (slowDown(e)) null else MessageRow.STATUS_FAILED
             } catch (e: IOException) {
                 // An upload that could not reach the server: try again later.
                 Log.w(TAG, "Send waiting: ${e.javaClass.simpleName}")
@@ -93,7 +108,8 @@ internal class SendQueue(
             }
             if (status == null) {
                 // No network: leave it queued and look again later, backing off to ten minutes.
-                val wait = (15L shl failures.coerceAtMost(5)).coerceAtMost(600)
+                val wait = maxOf((15L shl failures.coerceAtMost(5)).coerceAtMost(600), askedToWait)
+                askedToWait = 0
                 failures++
                 executor.schedule(::drain, wait, TimeUnit.SECONDS)
                 return
@@ -201,7 +217,7 @@ internal class SendQueue(
             MessageRow.STATUS_FAILED
         } catch (e: NonSuccessfulResponseCodeException) {
             Log.w(TAG, "Message refused by the server: ${e.code}")
-            MessageRow.STATUS_FAILED
+            if (slowDown(e)) null else MessageRow.STATUS_FAILED
         } catch (e: IOException) {
             Log.w(TAG, "Message not sent yet: ${e.javaClass.simpleName}")
             null
@@ -240,7 +256,7 @@ internal class SendQueue(
             MessageRow.STATUS_FAILED
         } catch (e: NonSuccessfulResponseCodeException) {
             Log.w(TAG, "Group message refused by the server: ${e.code}")
-            MessageRow.STATUS_FAILED
+            if (slowDown(e)) null else MessageRow.STATUS_FAILED
         } catch (e: IOException) {
             null
         }
