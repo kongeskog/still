@@ -39,6 +39,7 @@ fun WelcomeScreen(onLink: () -> Unit) {
                 "Still joins your Signal account as a linked device, like Signal Desktop. Your Signal app keeps working.",
                 style = MaterialTheme.typography.bodyLarge,
             )
+            TextMMD("No Signal account yet? Create one in the Signal app first.", style = MaterialTheme.typography.bodyLarge)
             TextMMD("Still is not made by Signal or Mudita.", style = MaterialTheme.typography.bodyMedium)
         }
         Column(Modifier.padding(16.dp)) {

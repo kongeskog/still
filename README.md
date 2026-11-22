@@ -74,6 +74,8 @@ Install the APK from the [releases page](https://github.com/kongeskog/still/rele
 you sideload any other app on the Kompakt.
 
 Still starts as a **linked device**, next to the official Signal app, which keeps working.
+You need an existing Signal account: Still cannot register a new phone number yet. If you
+have none, create it in the official Signal app first.
 
 1. Open Still and tap **Link to Signal**. A QR code appears.
 2. In Signal: Settings > Linked devices > Link a new device.
