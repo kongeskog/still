@@ -228,6 +228,7 @@ internal class LinkingManager(private val db: StillDatabase, private val store: 
 
     private companion object {
         const val TAG = "StillLink"
-        const val MAX_CODES = 7
+        // Half an hour of codes: enough to read the steps and fetch another phone.
+        const val MAX_CODES = 20
     }
 }

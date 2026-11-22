@@ -86,6 +86,10 @@ fun ConversationListScreen(
             BarPrimary(Icons.Plus, "New message", onNew)
         }
     }) {
+        if (threads.isEmpty() && archived == 0) {
+            // A new account's first screen: say why it is empty and where to start.
+            TextMMD("No conversations yet. Tap + to write to someone.", Modifier.padding(16.dp), style = MaterialTheme.typography.bodyLarge)
+        }
         LazyColumnMMD(Modifier.fillMaxSize(), scrollStep = 0, isScrollbarVisible = false) {
             items(threads.size, key = { threads[it].id }) { i ->
                 val thread = threads[i]

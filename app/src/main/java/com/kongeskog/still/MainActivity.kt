@@ -118,7 +118,7 @@ class MainActivity : ComponentActivity() {
                     current != null -> Chats(client)
                     page == Page.Link -> Linking(client, onBack = { page = Page.Welcome })
                     page == Page.Checks -> Checks(onBack = { page = Page.Welcome })
-                    else -> WelcomeScreen(onLink = { page = Page.Link }, onChecks = { page = Page.Checks })
+                    else -> WelcomeScreen(onLink = { page = Page.Link })
                 }
             }
         }
@@ -651,7 +651,7 @@ class MainActivity : ComponentActivity() {
             is LinkState.Failed -> LinkUi.Failed(it.reason)
         }
         BackHandler(onBack = onBack)
-        LinkScreen(state, onBack, onRetry = { client.startLinking() })
+        LinkScreen(state, onBack, onRetry = { client.cancelLinking(); client.startLinking() })
     }
 
     @Composable

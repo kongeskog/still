@@ -3,6 +3,8 @@ package com.kongeskog.still.ui
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,20 +28,20 @@ import com.mudita.mmd.components.text.TextMMD
 
 /** First run: nothing is linked yet. */
 @Composable
-fun WelcomeScreen(onLink: () -> Unit, onChecks: () -> Unit) {
+fun WelcomeScreen(onLink: () -> Unit) {
     Screen("Still") {
         Column(
             Modifier.weight(1f).fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            TextMMD("Link this phone to your Signal account.", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            TextMMD("Signal messages on your Kompakt.", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             TextMMD(
-                "Signal stays installed and stays your main app. Still is added as a linked device, like Signal Desktop.",
+                "Still joins your Signal account as a linked device, like Signal Desktop. Your Signal app keeps working.",
                 style = MaterialTheme.typography.bodyLarge,
             )
+            TextMMD("Still is not made by Signal or Mudita.", style = MaterialTheme.typography.bodyMedium)
         }
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            SecondaryButton("Library checks", Modifier.fillMaxWidth(), onClick = onChecks)
+        Column(Modifier.padding(16.dp)) {
             PrimaryButton("Link to Signal", Modifier.fillMaxWidth(), onClick = onLink)
         }
     }
@@ -56,35 +58,41 @@ sealed interface LinkUi {
 fun LinkScreen(state: LinkUi, onBack: () -> Unit, onRetry: () -> Unit) {
     Screen("Link to Signal", onBack) {
         Column(
-            Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             when (state) {
                 LinkUi.Connecting -> Note("Connecting to Signal…")
-                LinkUi.Registering -> Note("Signal approved the link. Setting up this device…")
+                LinkUi.Registering -> Note("Linked. Setting up…")
                 is LinkUi.Failed -> {
                     Note("Linking did not finish.")
                     TextMMD(state.reason, Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyMedium)
                 }
                 is LinkUi.Code -> {
-                    QrCode(state.url, Modifier.size(264.dp))
-                    TextMMD(
-                        "In Signal: Settings, Linked devices, Link a new device, then scan this code. " +
-                            "It is replaced every 90 seconds, and keeps working after you leave this screen.\n" +
-                            "Signal on this same phone cannot scan its own screen; see the README.",
-                        Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                    QrCode(state.url, Modifier.size(200.dp))
+                    Step("1", "In Signal: Settings > Linked devices > Link a new device.")
+                    Step("2", "Scan this code. Signal on this phone? Photograph the code with another phone and scan that.")
+                    Step("3", "Choose Transfer message history.")
                 }
             }
         }
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             when (state) {
                 is LinkUi.Failed -> PrimaryButton("Try again", Modifier.fillMaxWidth(), onClick = onRetry)
+                // A code lasts 90 seconds; a fresh one gives the full time for the photo.
+                is LinkUi.Code -> SecondaryButton("New code", Modifier.fillMaxWidth(), onClick = onRetry)
                 else -> Spacer(Modifier.size(56.dp))
             }
         }
+    }
+}
+
+@Composable
+private fun Step(number: String, text: String) {
+    Row(Modifier.fillMaxWidth()) {
+        TextMMD(number, Modifier.width(24.dp), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+        TextMMD(text, style = MaterialTheme.typography.bodyMedium)
     }
 }
 

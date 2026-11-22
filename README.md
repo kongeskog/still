@@ -70,16 +70,27 @@ copy of your account.
 
 ## Setting up
 
-Still starts as a **linked device**, next to the official Signal app.
+Install the APK from the [releases page](https://github.com/kongeskog/still/releases) the way
+you sideload any other app on the Kompakt.
 
-1. Open Still and tap **Link to Signal**.
-2. Signal links a device by scanning its QR code with the camera, so it cannot scan a code
-   on its own screen. With the phone connected to a computer, run `tools/show-link-code.sh`.
-   It reads the code over adb and shows it in your browser.
-3. In Signal: Settings > Linked devices > Link a new device, and scan the computer screen.
-   Choose **Transfer message history** if you want your old conversations.
+Still starts as a **linked device**, next to the official Signal app, which keeps working.
 
-Use it this way for a while. When you are ready to drop the official app:
+1. Open Still and tap **Link to Signal**. A QR code appears.
+2. In Signal: Settings > Linked devices > Link a new device.
+3. Scan the code:
+   - **Signal is on another phone:** point it at the Kompakt's screen.
+   - **Signal is on the Kompakt itself:** it cannot scan its own screen. Photograph the code
+     with another phone or camera, then scan that photo from the other screen. A code lasts
+     90 seconds; tap **New code** just before you take the photo to get the full time.
+4. Choose **Transfer message history** if you want your old conversations.
+
+Still restarts, connects, and fills in your conversations. Old photos and files are not part
+of the transfer.
+
+If you have a computer with adb to hand, `tools/show-link-code.sh` reads the code from the
+phone and shows it in your browser instead. It needs Java and this project built once.
+
+Use Still this way for a while. When you are ready to drop the official app:
 Settings > Account > **Make this the main device**. This signs the official app out. No SMS
 code is needed and your safety numbers do not change. The way back is to register the
 official app again with your number.
