@@ -3,10 +3,10 @@
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
     <path android:fillColor="#FFFFFF" android:pathData="M0,0h108v108h-108z" />
-    <!-- Speech bubble outline with a single level line: still water. -->
-    <path android:strokeColor="#000000" android:strokeWidth="7" android:strokeLineJoin="round"
+    <!-- A round speech bubble with its tail at the lower left, and one level line: still water. -->
+    <path android:strokeColor="#000000" android:strokeWidth="7" android:strokeLineJoin="round" android:strokeLineCap="round"
         android:fillColor="#00000000"
-        android:pathData="M28,28h52a8,8 0,0 1,8 8v30a8,8 0,0 1,-8 8h-30l-14,12v-12h-8a8,8 0,0 1,-8 -8v-30a8,8 0,0 1,8 -8z" />
+        android:pathData="M41.3,77.2A30,30 0,1 0,28,65L26,82Z" />
     <path android:strokeColor="#000000" android:strokeWidth="6" android:strokeLineCap="round"
-        android:pathData="M38,51L70,51" />
+        android:pathData="M41,50L67,50" />
 </vector>
