@@ -75,7 +75,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private enum class Page { Welcome, Link, Checks }
+private enum class Page { Welcome, Link, Checks, SignUp }
 
 /** Messages loaded per step of "Load earlier". */
 private const val PAGE = 60
@@ -118,7 +118,8 @@ class MainActivity : ComponentActivity() {
                     current != null -> Chats(client)
                     page == Page.Link -> Linking(client, onBack = { page = Page.Welcome })
                     page == Page.Checks -> Checks(onBack = { page = Page.Welcome })
-                    else -> WelcomeScreen(onLink = { page = Page.Link })
+                    page == Page.SignUp -> SignUpFlow(client, onBack = { page = Page.Welcome }, onDone = ::restart)
+                    else -> WelcomeScreen(onLink = { page = Page.Link }, onSignUp = { page = Page.SignUp })
                 }
             }
         }

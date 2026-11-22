@@ -95,6 +95,7 @@ class DemoActivity : ComponentActivity() {
                     "details" -> DetailsScreen(DetailsUi(title = "Book club", label = "Group · 4 members", isGroup = true, timer = "1 wk", canEdit = true, muted = false, pinned = true, canLeave = true, members = people), {}, {}, {}, {}, {}, {})
                     "timer" -> TimerScreen(604800, { if (it == 0) "Off" else "$it s" }, {}, {})
                     "contacts" -> ContactsScreen(people, {}, onNewGroup = {}) {}
+                    "captcha" -> CaptchaScreen({}) {}
                     "newgroup" -> NewGroupScreen(people, false, {}) { _, _ -> }
                     "call" -> CallScreen(CallUi("Ada Lovelace", "2:41", incoming = false, muted = false, speaker = true), {}, {}, {}, {})
                     "call-in" -> CallScreen(CallUi("Ada Lovelace", "Incoming call…", incoming = true, muted = false, speaker = false), {}, {}, {}, {})

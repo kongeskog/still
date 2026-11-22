@@ -12,7 +12,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import com.mudita.mmd.components.text_field.TextFieldMMD
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +35,7 @@ import com.mudita.mmd.components.text.TextMMD
 
 /** First run: nothing is linked yet. */
 @Composable
-fun WelcomeScreen(onLink: () -> Unit) {
+fun WelcomeScreen(onLink: () -> Unit, onSignUp: () -> Unit) {
     Screen("Still") {
         Column(
             Modifier.weight(1f).fillMaxWidth().padding(16.dp),
@@ -39,10 +46,10 @@ fun WelcomeScreen(onLink: () -> Unit) {
                 "Still joins your Signal account as a linked device, like Signal Desktop. Your Signal app keeps working.",
                 style = MaterialTheme.typography.bodyLarge,
             )
-            TextMMD("No Signal account yet? Create one in the Signal app first.", style = MaterialTheme.typography.bodyLarge)
             TextMMD("Still is not made by Signal or Mudita.", style = MaterialTheme.typography.bodyMedium)
         }
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SecondaryButton("Create a new account", Modifier.fillMaxWidth(), onClick = onSignUp)
             PrimaryButton("Link to Signal", Modifier.fillMaxWidth(), onClick = onLink)
         }
     }
@@ -117,6 +124,46 @@ fun QrCode(text: String, modifier: Modifier = Modifier) {
                     drawRect(Color.Black, Offset(origin + x * cell, origin + y * cell), Size(cell, cell))
                 }
             }
+        }
+    }
+}
+
+
+/**
+ * One step of creating an account: a line saying what is wanted, one field, one button.
+ * The same shape serves the phone number, the code from the text message, and the name.
+ */
+@Composable
+fun SignUpFieldScreen(
+    title: String,
+    prompt: String,
+    hint: String,
+    action: String,
+    numeric: Boolean,
+    busy: Boolean,
+    error: String?,
+    onBack: () -> Unit,
+    /** A second, quieter action such as "Call me instead"; null hides it. */
+    secondary: Pair<String, () -> Unit>? = null,
+    onSubmit: (String) -> Unit,
+) {
+    var text by remember(title) { mutableStateOf("") }
+    Screen(title, onBack) {
+        Column(Modifier.weight(1f).fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            TextMMD(error ?: prompt, style = MaterialTheme.typography.bodyLarge, fontWeight = if (error != null) FontWeight.Bold else FontWeight.Normal)
+            TextFieldMMD(
+                value = text, onValueChange = { text = it }, modifier = Modifier.fillMaxWidth(),
+                textStyle = MaterialTheme.typography.titleLarge, singleLine = true,
+                placeholder = { TextMMD(hint, style = MaterialTheme.typography.titleLarge) },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = if (numeric) KeyboardType.Phone else KeyboardType.Text,
+                    capitalization = if (numeric) KeyboardCapitalization.None else KeyboardCapitalization.Words,
+                ),
+            )
+        }
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            if (secondary != null) SecondaryButton(secondary.first, Modifier.fillMaxWidth(), enabled = !busy, onClick = secondary.second)
+            PrimaryButton(if (busy) "One moment…" else action, Modifier.fillMaxWidth(), enabled = !busy && text.isNotBlank()) { onSubmit(text.trim()) }
         }
     }
 }

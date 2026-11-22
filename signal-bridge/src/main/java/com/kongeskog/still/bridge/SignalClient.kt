@@ -3,6 +3,8 @@ package com.kongeskog.still.bridge
 import android.content.Context
 import com.kongeskog.still.bridge.db.StillDatabase
 import kotlinx.coroutines.CoroutineScope
+import org.signal.libsignal.zkgroup.profiles.ProfileKey
+import org.whispersystems.signalservice.api.profiles.AvatarUploadParams
 import org.signal.core.models.ServiceId.ACI
 import org.signal.libsignal.protocol.IdentityKey
 import org.signal.libsignal.protocol.fingerprint.NumericFingerprintGenerator
@@ -168,6 +170,28 @@ class SignalClient private constructor(private val context: Context) {
     /** The date this build's Signal libraries were brought up to date, as written in the source. */
     val librariesUpdated: String get() = SignalEnvironment.LIBRARIES_UPDATED
 
+    /** Registering a number that has no Signal account yet. */
+    val signUp: SignUp by lazy { SignUp(db, store) }
+
+    /**
+     * A new account has no profile until its first connection. Without a name other people
+     * see only a number, and the account cannot be added to groups.
+     */
+    private fun uploadPendingName(deps: SignalDependencies) {
+        val name = store.string(SignUp.PENDING_NAME) ?: return
+        try {
+            val key = ProfileKey(store.bytes(AccountStore.PROFILE_KEY) ?: return)
+            deps.profileApi.setVersionedProfile(
+                deps.credentials.aci, key, name, "", "", null, AvatarUploadParams.unchanged(false), emptyList(), false,
+            ).successOrThrow()
+            db.keyValue().remove(SignUp.PENDING_NAME)
+            android.util.Log.i("StillSignUp", "Profile name set")
+        } catch (e: Throwable) {
+            // Left in place: tried again at the next start.
+            android.util.Log.w("StillSignUp", "Profile name not set yet: ${e.javaClass.simpleName}")
+        }
+    }
+
     private var calls: Calls? = null
     private val _call = MutableStateFlow(CallState())
     /** The voice call in progress or ringing; [CallPhase.Idle] when there is none. */
@@ -241,6 +265,7 @@ class SignalClient private constructor(private val context: Context) {
             },
             onCaughtUp = {
                 directory.refresh()
+                scope.launch(Dispatchers.IO) { uploadPendingName(deps) }
                 // Keys are topped up and rotated at start and twice a day after: the process can live for weeks.
                 scope.launch(Dispatchers.IO) {
                     while (true) {
@@ -602,6 +627,8 @@ class SignalClient private constructor(private val context: Context) {
 
     companion object {
         const val LIST_VISIBLE = -1L
+        /** The page that shows Signal's sign-up captcha; it ends by loading a `signalcaptcha://` address. */
+        const val CAPTCHA_URL = SignUp.CAPTCHA_URL
         /** Signal retires a version after about ninety days; warn a month before that. */
         private const val UPDATE_DUE_AFTER_DAYS = 60
         private const val NOTIFICATIONS = "setting.notifications"

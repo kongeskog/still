@@ -22,6 +22,7 @@ import org.whispersystems.signalservice.api.groupsv2.ClientZkOperations
 import org.whispersystems.signalservice.api.groupsv2.GroupsV2Api
 import org.whispersystems.signalservice.api.groupsv2.GroupsV2Operations
 import org.whispersystems.signalservice.api.services.ProfileService
+import org.whispersystems.signalservice.api.profiles.ProfileApi
 import org.whispersystems.signalservice.api.crypto.SignalServiceCipher
 import org.whispersystems.signalservice.api.keys.KeysApi
 import org.whispersystems.signalservice.api.keys.PreKeyRepository
@@ -98,6 +99,9 @@ internal class SignalDependencies(
         ProfileService(ClientZkOperations.create(SignalEnvironment.configuration).profileOperations, authenticatedWebSocket, unauthenticatedWebSocket)
     }
     val storageService by lazy { StorageServiceService(StorageServiceApi(authenticatedWebSocket, pushServiceSocket)) }
+    val profileApi by lazy {
+        ProfileApi(authenticatedWebSocket, unauthenticatedWebSocket, pushServiceSocket, ClientZkOperations.create(SignalEnvironment.configuration).profileOperations)
+    }
     val callingApi by lazy { CallingApi(authenticatedWebSocket, unauthenticatedWebSocket, pushServiceSocket) }
     val certificateApi by lazy { CertificateApi(authenticatedWebSocket) }
     val messageReceiver by lazy { SignalServiceMessageReceiver(pushServiceSocket) }
