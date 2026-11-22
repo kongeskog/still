@@ -80,6 +80,9 @@ internal class SendQueue(
      */
     private fun slowDown(e: NonSuccessfulResponseCodeException): Boolean {
         if (e.code != 429) return false
+        // Which request was limited (fetching keys or the send itself): method names only.
+        val where = e.stackTrace.take(8).joinToString(" < ") { it.className.substringAfterLast('.') + "." + it.methodName }
+        Log.w(TAG, "Rate limited at $where")
         val asked = (e as? RateLimitException)?.retryAfterMilliseconds?.orElse(null) ?: 0L
         askedToWait = (asked / 1000 + 1).coerceIn(30, 3600)
         return true

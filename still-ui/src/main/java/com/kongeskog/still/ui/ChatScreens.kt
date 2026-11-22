@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -336,9 +337,10 @@ private fun Composer(
             justOpened = false
         }
     }
-    Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        // The field starts at the screen edge, so its cursor sits where it does in Messages.
-        Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).padding(start = 4.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        BarAction(Icons.Attach, "Attach", onAttach)
+        // Pulled left: the field's own 16dp inset on top of the button's margin left the cursor adrift.
+        Box(Modifier.weight(1f).offset(x = (-10).dp), contentAlignment = Alignment.CenterStart) {
             TextFieldMMD(
                 value = draft,
                 onValueChange = {
@@ -363,7 +365,6 @@ private fun Composer(
             if (justOpened && !focused && draft.isEmpty()) DrawnCursor()
         }
         // An empty field offers a voice note instead, as Signal does.
-        BarAction(Icons.Attach, "Attach", onAttach)
         if (draft.isEmpty()) SquareButton(Icons.Mic, "Record voice note", onRecord) else SquareButton(Icons.Send, "Send", send)
     }
 }
