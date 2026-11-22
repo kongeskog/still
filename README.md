@@ -14,7 +14,18 @@ Still is **unofficial**. It is not made, endorsed or supported by Signal or by M
 - This is early software, used daily by one person. Parts of it have had little or no
   testing. Don't make it your only way to reach someone who matters until you have tried it
   alongside the official app.
-- There is no ready-made download. You build it yourself and install it over USB.
+- Installing means sideloading an APK over USB, from the [releases page](https://github.com/kongeskog/still/releases) or built yourself.
+
+## Screenshots
+
+Taken on an emulator with made-up conversations, in greyscale as the Kompakt shows them.
+
+| | | |
+|---|---|---|
+| ![Conversation list](docs/screenshots/conversations.png) | ![Conversation](docs/screenshots/conversation.png) | ![Voice note and file](docs/screenshots/attachments.png) |
+| ![Message actions](docs/screenshots/message-actions.png) | ![Group details](docs/screenshots/group-details.png) | ![New group](docs/screenshots/new-group.png) |
+| ![Incoming call](docs/screenshots/incoming-call.png) | ![Call](docs/screenshots/call.png) | ![Safety number](docs/screenshots/safety-number.png) |
+| ![Search](docs/screenshots/search.png) | ![Settings](docs/screenshots/settings.png) | |
 
 ## What it does
 
