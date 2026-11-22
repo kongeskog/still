@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Debug builds only: shows any screen with sample data, for checking layout on the emulator. -->
+        <activity android:name=".DemoActivity" android:exported="true" android:theme="@style/EinkTheme" android:windowSoftInputMode="adjustResize" />
+    </application>
+</manifest>

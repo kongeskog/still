@@ -1,0 +1,789 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 8,
+    "identityHash": "4d82e22d94e02960f7580322aa0087ea",
+    "entities": [
+      {
+        "tableName": "key_value",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY(`key`))",
+        "fields": [
+          {
+            "fieldPath": "key",
+            "columnName": "key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "key"
+          ]
+        }
+      },
+      {
+        "tableName": "identity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account` INTEGER NOT NULL, `address` TEXT NOT NULL, `identityKey` BLOB NOT NULL, `addedAt` INTEGER NOT NULL, `trust` INTEGER NOT NULL, PRIMARY KEY(`account`, `address`))",
+        "fields": [
+          {
+            "fieldPath": "account",
+            "columnName": "account",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "identityKey",
+            "columnName": "identityKey",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addedAt",
+            "columnName": "addedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trust",
+            "columnName": "trust",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "account",
+            "address"
+          ]
+        }
+      },
+      {
+        "tableName": "session",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account` INTEGER NOT NULL, `address` TEXT NOT NULL, `deviceId` INTEGER NOT NULL, `record` BLOB NOT NULL, PRIMARY KEY(`account`, `address`, `deviceId`))",
+        "fields": [
+          {
+            "fieldPath": "account",
+            "columnName": "account",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceId",
+            "columnName": "deviceId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "record",
+            "columnName": "record",
+            "affinity": "BLOB",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "account",
+            "address",
+            "deviceId"
+          ]
+        }
+      },
+      {
+        "tableName": "prekey",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account` INTEGER NOT NULL, `id` INTEGER NOT NULL, `record` BLOB NOT NULL, `staleAt` INTEGER, PRIMARY KEY(`account`, `id`))",
+        "fields": [
+          {
+            "fieldPath": "account",
+            "columnName": "account",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "record",
+            "columnName": "record",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "staleAt",
+            "columnName": "staleAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "account",
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "signed_prekey",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account` INTEGER NOT NULL, `id` INTEGER NOT NULL, `record` BLOB NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`account`, `id`))",
+        "fields": [
+          {
+            "fieldPath": "account",
+            "columnName": "account",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "record",
+            "columnName": "record",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "account",
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "kyber_prekey",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account` INTEGER NOT NULL, `id` INTEGER NOT NULL, `record` BLOB NOT NULL, `timestamp` INTEGER NOT NULL, `lastResort` INTEGER NOT NULL, `staleAt` INTEGER, PRIMARY KEY(`account`, `id`))",
+        "fields": [
+          {
+            "fieldPath": "account",
+            "columnName": "account",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "record",
+            "columnName": "record",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastResort",
+            "columnName": "lastResort",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "staleAt",
+            "columnName": "staleAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "account",
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "sender_key",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`address` TEXT NOT NULL, `deviceId` INTEGER NOT NULL, `distributionId` TEXT NOT NULL, `record` BLOB NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`address`, `deviceId`, `distributionId`))",
+        "fields": [
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceId",
+            "columnName": "deviceId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "distributionId",
+            "columnName": "distributionId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "record",
+            "columnName": "record",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "address",
+            "deviceId",
+            "distributionId"
+          ]
+        }
+      },
+      {
+        "tableName": "sender_key_shared",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`distributionId` TEXT NOT NULL, `address` TEXT NOT NULL, `deviceId` INTEGER NOT NULL, PRIMARY KEY(`distributionId`, `address`, `deviceId`))",
+        "fields": [
+          {
+            "fieldPath": "distributionId",
+            "columnName": "distributionId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceId",
+            "columnName": "deviceId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "distributionId",
+            "address",
+            "deviceId"
+          ]
+        }
+      },
+      {
+        "tableName": "kyber_used",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account` INTEGER NOT NULL, `kyberId` INTEGER NOT NULL, `signedPreKeyId` INTEGER NOT NULL, `baseKey` BLOB NOT NULL, PRIMARY KEY(`account`, `kyberId`, `signedPreKeyId`, `baseKey`))",
+        "fields": [
+          {
+            "fieldPath": "account",
+            "columnName": "account",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kyberId",
+            "columnName": "kyberId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "signedPreKeyId",
+            "columnName": "signedPreKeyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseKey",
+            "columnName": "baseKey",
+            "affinity": "BLOB",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "account",
+            "kyberId",
+            "signedPreKeyId",
+            "baseKey"
+          ]
+        }
+      },
+      {
+        "tableName": "envelope_cache",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `envelope` BLOB NOT NULL, `serverDeliveredTimestamp` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "envelope",
+            "columnName": "envelope",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serverDeliveredTimestamp",
+            "columnName": "serverDeliveredTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "recipient",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `aci` TEXT, `pni` TEXT, `e164` TEXT, `name` TEXT, `profileKey` BLOB, `profileName` TEXT, `profileFetchedAt` INTEGER NOT NULL, `expireTimerVersion` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aci",
+            "columnName": "aci",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pni",
+            "columnName": "pni",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "e164",
+            "columnName": "e164",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "profileKey",
+            "columnName": "profileKey",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "profileName",
+            "columnName": "profileName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "profileFetchedAt",
+            "columnName": "profileFetchedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expireTimerVersion",
+            "columnName": "expireTimerVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_recipient_aci",
+            "unique": true,
+            "columnNames": [
+              "aci"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_recipient_aci` ON `${TABLE_NAME}` (`aci`)"
+          }
+        ]
+      },
+      {
+        "tableName": "thread",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `recipientId` INTEGER, `groupId` TEXT, `groupMasterKey` BLOB, `title` TEXT, `lastMessageAt` INTEGER NOT NULL, `snippet` TEXT, `unread` INTEGER NOT NULL, `expireTimer` INTEGER NOT NULL, `groupRevision` INTEGER NOT NULL, `canEdit` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipientId",
+            "columnName": "recipientId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "groupId",
+            "columnName": "groupId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "groupMasterKey",
+            "columnName": "groupMasterKey",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lastMessageAt",
+            "columnName": "lastMessageAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "snippet",
+            "columnName": "snippet",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "unread",
+            "columnName": "unread",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expireTimer",
+            "columnName": "expireTimer",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "groupRevision",
+            "columnName": "groupRevision",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "canEdit",
+            "columnName": "canEdit",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_thread_recipientId",
+            "unique": true,
+            "columnNames": [
+              "recipientId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_thread_recipientId` ON `${TABLE_NAME}` (`recipientId`)"
+          },
+          {
+            "name": "index_thread_groupId",
+            "unique": true,
+            "columnNames": [
+              "groupId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_thread_groupId` ON `${TABLE_NAME}` (`groupId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "message",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `threadId` INTEGER NOT NULL, `senderId` INTEGER, `sentAt` INTEGER NOT NULL, `receivedAt` INTEGER NOT NULL, `body` TEXT, `attachmentCount` INTEGER NOT NULL, `status` INTEGER NOT NULL, `expiresIn` INTEGER NOT NULL, `expireStartedAt` INTEGER, `unread` INTEGER NOT NULL, `quoteText` TEXT, `quoteAuthorId` INTEGER, `edited` INTEGER NOT NULL, `quoteSentAt` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "threadId",
+            "columnName": "threadId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "senderId",
+            "columnName": "senderId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "sentAt",
+            "columnName": "sentAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receivedAt",
+            "columnName": "receivedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "body",
+            "columnName": "body",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "attachmentCount",
+            "columnName": "attachmentCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expiresIn",
+            "columnName": "expiresIn",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expireStartedAt",
+            "columnName": "expireStartedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "unread",
+            "columnName": "unread",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quoteText",
+            "columnName": "quoteText",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "quoteAuthorId",
+            "columnName": "quoteAuthorId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "edited",
+            "columnName": "edited",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quoteSentAt",
+            "columnName": "quoteSentAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_message_threadId_sentAt",
+            "unique": false,
+            "columnNames": [
+              "threadId",
+              "sentAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_message_threadId_sentAt` ON `${TABLE_NAME}` (`threadId`, `sentAt`)"
+          },
+          {
+            "name": "index_message_sentAt",
+            "unique": false,
+            "columnNames": [
+              "sentAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_message_sentAt` ON `${TABLE_NAME}` (`sentAt`)"
+          }
+        ]
+      },
+      {
+        "tableName": "group_member",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`threadId` INTEGER NOT NULL, `recipientId` INTEGER NOT NULL, PRIMARY KEY(`threadId`, `recipientId`))",
+        "fields": [
+          {
+            "fieldPath": "threadId",
+            "columnName": "threadId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipientId",
+            "columnName": "recipientId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "threadId",
+            "recipientId"
+          ]
+        }
+      },
+      {
+        "tableName": "reaction",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`messageId` INTEGER NOT NULL, `reactorId` INTEGER NOT NULL, `emoji` TEXT NOT NULL, PRIMARY KEY(`messageId`, `reactorId`))",
+        "fields": [
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reactorId",
+            "columnName": "reactorId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "emoji",
+            "columnName": "emoji",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "messageId",
+            "reactorId"
+          ]
+        }
+      },
+      {
+        "tableName": "attachment",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `messageId` INTEGER NOT NULL, `pointer` BLOB, `contentType` TEXT NOT NULL, `fileName` TEXT, `size` INTEGER NOT NULL, `voiceNote` INTEGER NOT NULL, `localPath` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "messageId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pointer",
+            "columnName": "pointer",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "contentType",
+            "columnName": "contentType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "fileName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "size",
+            "columnName": "size",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "voiceNote",
+            "columnName": "voiceNote",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localPath",
+            "columnName": "localPath",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_attachment_messageId",
+            "unique": false,
+            "columnNames": [
+              "messageId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_attachment_messageId` ON `${TABLE_NAME}` (`messageId`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4d82e22d94e02960f7580322aa0087ea')"
+    ]
+  }
+}
