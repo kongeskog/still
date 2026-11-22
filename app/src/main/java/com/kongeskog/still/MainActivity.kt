@@ -222,7 +222,7 @@ class MainActivity : ComponentActivity() {
         }
         if (call.phase != CallPhase.Idle) {
             val status = when (call.phase) {
-                CallPhase.Incoming -> "Incoming call"
+                CallPhase.Incoming -> "Incoming call…"
                 CallPhase.Calling -> "Calling…"
                 CallPhase.Ringing -> "Ringing…"
                 CallPhase.Connecting -> "Connecting…"

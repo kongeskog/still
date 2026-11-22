@@ -83,6 +83,16 @@ object Icons {
         arcToRelative(15f, 15f, 0f, false, true, -15f, -15f)
         arcToRelative(2f, 2f, 0f, false, true, 2f, -2f)
     }
+    val MicOff = lineIcon("Mute") {
+        moveTo(9f, 6f); arcToRelative(3f, 3f, 0f, true, true, 6f, 0f); lineTo(15f, 11f); arcToRelative(3f, 3f, 0f, true, true, -6f, 0f); close()
+        moveTo(6f, 11f); arcToRelative(6f, 6f, 0f, false, false, 12f, 0f); moveTo(12f, 17f); lineTo(12f, 21f)
+        moveTo(4f, 3f); lineTo(20f, 21f)
+    }
+    val Speaker = lineIcon("Speaker") {
+        moveTo(3f, 9.5f); lineTo(7f, 9.5f); lineTo(12f, 5f); lineTo(12f, 19f); lineTo(7f, 14.5f); lineTo(3f, 14.5f); close()
+        moveTo(15.5f, 9f); arcToRelative(4f, 4f, 0f, false, true, 0f, 6f)
+        moveTo(18f, 6.5f); arcToRelative(7.5f, 7.5f, 0f, false, true, 0f, 11f)
+    }
     val Search = lineIcon("Search") { circle(10.5f, 10.5f, 6f); moveTo(15f, 15f); lineTo(20.5f, 20.5f) }
     val Attach = lineIcon("Attach") {
         moveTo(4f, 5f); lineTo(20f, 5f); lineTo(20f, 19f); lineTo(4f, 19f); close()

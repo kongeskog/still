@@ -18,8 +18,8 @@ android {
         applicationId = "com.kongeskog.still"
         minSdk = 31
         targetSdk = 31 // the Kompakt runs Android 12
-        versionCode = 2
-        versionName = "0.1.0"
+        versionCode = 3
+        versionName = "0.1.1"
         // The phone is arm64. `-Pemulator` adds x86_64 for the desktop emulator only.
         ndk { abiFilters += if (project.hasProperty("emulator")) listOf("arm64-v8a", "x86_64") else listOf("arm64-v8a") }
     }

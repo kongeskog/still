@@ -97,7 +97,7 @@ class DemoActivity : ComponentActivity() {
                     "contacts" -> ContactsScreen(people, {}, onNewGroup = {}) {}
                     "newgroup" -> NewGroupScreen(people, false, {}) { _, _ -> }
                     "call" -> CallScreen(CallUi("Ada Lovelace", "2:41", incoming = false, muted = false, speaker = true), {}, {}, {}, {})
-                    "call-in" -> CallScreen(CallUi("Ada Lovelace", "Incoming call", incoming = true, muted = false, speaker = false), {}, {}, {}, {})
+                    "call-in" -> CallScreen(CallUi("Ada Lovelace", "Incoming call…", incoming = true, muted = false, speaker = false), {}, {}, {}, {})
                     "safety" -> SafetyNumberScreen("Ada Lovelace", "123456789012345678901234567890123456789012345678901234567890".chunked(5).mapIndexed { i, _ -> "%05d".format((i * 7919 + 10007) % 100000) }.joinToString(""), {})
                     "search" -> SearchScreen(
                         listOf(SearchItem(1, 1, "Ada Lovelace", "Are we still on for the walk tomorrow?", "9:12 AM"), SearchItem(2, 2, "Book club", "Walk first, then coffee", "Thursday")),

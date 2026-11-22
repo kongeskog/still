@@ -46,7 +46,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
@@ -453,23 +455,54 @@ fun MessageScreen(
 
 data class CallUi(val name: String, val status: String, val incoming: Boolean, val muted: Boolean, val speaker: Boolean)
 
-/** A voice call. Nothing on it moves except the minutes and seconds once the call is connected. */
+/**
+ * A voice call, laid out like the Kompakt's own phone call screens: status and name at the
+ * top, round buttons with a label under each, and the red-button equivalent (an outlined
+ * circle with a lowered handset) at the bottom. Only the timer changes while a call runs.
+ */
 @Composable
 fun CallScreen(state: CallUi, onAnswer: () -> Unit, onEnd: () -> Unit, onMute: (Boolean) -> Unit, onSpeaker: (Boolean) -> Unit) {
-    Screen(state.name, label = "Signal call") {
-        Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-            TextMMD(state.status, style = MaterialTheme.typography.headlineLarge)
-        }
+    Column(Modifier.fillMaxSize().background(Color.White), horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(Modifier.height(72.dp))
+        TextMMD(state.status, style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(12.dp))
+        TextMMD(
+            state.name, Modifier.padding(horizontal = 16.dp), style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold,
+            maxLines = 2, overflow = TextOverflow.Ellipsis,
+        )
+        TextMMD("Signal", Modifier.padding(top = 8.dp), style = MaterialTheme.typography.bodyMedium)
+        Spacer(Modifier.weight(1f))
         if (state.incoming) {
-            Row(Modifier.fillMaxWidth().padding(16.dp)) {
-                SecondaryButton("Decline", Modifier.weight(1f), onClick = onEnd)
-                Spacer(Modifier.width(16.dp))
-                PrimaryButton("Answer", Modifier.weight(1f), onClick = onAnswer)
+            Row(Modifier.padding(bottom = 40.dp), verticalAlignment = Alignment.Top) {
+                CallButton(Icons.Phone, "Decline", filled = false, lowered = true, onClick = onEnd)
+                Spacer(Modifier.width(104.dp))
+                CallButton(Icons.Phone, "Accept", filled = true, onClick = onAnswer)
             }
         } else {
-            SwitchRow("Mute", state.muted, onMute)
-            SwitchRow("Speaker", state.speaker, onSpeaker)
-            PrimaryButton("End call", Modifier.fillMaxWidth().padding(16.dp), onClick = onEnd)
+            Row(Modifier.padding(bottom = 40.dp), verticalAlignment = Alignment.Top) {
+                CallButton(Icons.MicOff, "Mute", filled = state.muted, outlined = false) { onMute(!state.muted) }
+                Spacer(Modifier.width(72.dp))
+                CallButton(Icons.Speaker, "Speaker", filled = state.speaker, outlined = false) { onSpeaker(!state.speaker) }
+            }
+            Box(Modifier.padding(bottom = 32.dp)) { CallButton(Icons.Phone, "End call", filled = false, lowered = true, onClick = onEnd) }
         }
+    }
+}
+
+/**
+ * A round call button with its label underneath. Filled black means "on" or "accept";
+ * an outline with a lowered handset means hanging up; a bare icon is a switch that is off.
+ */
+@Composable
+private fun CallButton(icon: ImageVector, label: String, filled: Boolean, outlined: Boolean = true, lowered: Boolean = false, onClick: () -> Unit) {
+    Column(Modifier.width(96.dp).clickable(onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            Modifier.size(72.dp)
+                .then(if (filled) Modifier.background(Color.Black, CircleShape) else if (outlined) Modifier.border(2.dp, Color.Black, CircleShape) else Modifier),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(icon, null, Modifier.size(36.dp).then(if (lowered) Modifier.rotate(135f) else Modifier), tint = if (filled) Color.White else Color.Black)
+        }
+        TextMMD(label, Modifier.padding(top = 8.dp), style = MaterialTheme.typography.bodyMedium, maxLines = 1)
     }
 }

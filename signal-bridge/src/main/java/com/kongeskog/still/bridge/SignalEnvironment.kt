@@ -26,7 +26,7 @@ internal object SignalEnvironment {
      * signal-cli's convention: the official client version the library tracks, then our own
      * name. Bump the first part together with the library version.
      */
-    const val USER_AGENT = "Signal-Android/8.35.1 Still/0.1.0"
+    const val USER_AGENT = "Signal-Android/8.35.1 Still/0.1.1"
 
     /**
      * The day the Signal libraries and the version claimed in [USER_AGENT] were last brought
