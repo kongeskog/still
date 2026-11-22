@@ -230,7 +230,9 @@ interface ChatDao {
     @Query("SELECT COUNT(*) FROM message WHERE threadId = :threadId AND sentAt = :sentAt AND senderId IS :senderId")
     fun countMessage(threadId: Long, sentAt: Long, senderId: Long?): Int
     @Query("SELECT threadId FROM message WHERE sentAt = :sentAt AND senderId IS :senderId LIMIT 1") fun threadOfMessage(sentAt: Long, senderId: Long?): Long?
-    @Query("UPDATE message SET status = :status WHERE senderId IS NULL AND sentAt IN (:sentAt) AND status < :status AND status != 4")
+    // Not a message still queued (0): in a group one member's receipt can arrive while another
+    // member is still owed the message, and raising it here would take it out of the queue.
+    @Query("UPDATE message SET status = :status WHERE senderId IS NULL AND sentAt IN (:sentAt) AND status < :status AND status NOT IN (0, 4)")
     fun raiseStatus(sentAt: List<Long>, status: Int)
 
     @Query(

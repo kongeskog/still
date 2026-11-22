@@ -71,6 +71,7 @@ internal class SendQueue(
 
     /** Seconds the server asked us to hold off, from its last "too many requests" answer. */
     private var askedToWait = 0L
+    @Volatile private var notBefore = 0L
 
     fun kick() { executor.execute(::drain) }
 
@@ -82,13 +83,16 @@ internal class SendQueue(
         if (e.code != 429) return false
         // Which request was limited (fetching keys or the send itself): method names only.
         val where = e.stackTrace.take(8).joinToString(" < ") { it.className.substringAfterLast('.') + "." + it.methodName }
-        Log.w(TAG, "Rate limited at $where")
         val asked = (e as? RateLimitException)?.retryAfterMilliseconds?.orElse(null) ?: 0L
         askedToWait = (asked / 1000 + 1).coerceIn(30, 3600)
+        Log.w(TAG, "Rate limited at $where; server asked for ${asked / 1000}s")
         return true
     }
 
     private fun drain() {
+        // Asked to hold off: a retry now would be refused again and would re-send to the
+        // members who already have the message. The drain scheduled for then picks it up.
+        if (System.currentTimeMillis() < notBefore) return
         dao.failOldSends(System.currentTimeMillis() - GIVE_UP_AFTER)
         dao.pruneSendLog(System.currentTimeMillis() - GIVE_UP_AFTER)
         for (row in dao.pendingSends()) {
@@ -112,6 +116,7 @@ internal class SendQueue(
             if (status == null) {
                 // No network: leave it queued and look again later, backing off to ten minutes.
                 val wait = maxOf((15L shl failures.coerceAtMost(5)).coerceAtMost(600), askedToWait)
+                if (askedToWait > 0) notBefore = System.currentTimeMillis() + wait * 1000 - 500
                 askedToWait = 0
                 failures++
                 executor.schedule(::drain, wait, TimeUnit.SECONDS)
@@ -244,6 +249,8 @@ internal class SendQueue(
         return try {
             val access = acis.map(::sealed)
             val events = SignalServiceMessageSender.LegacyGroupEvents.EMPTY
+            val strangers = acis.count { !deps.dataStore.aci().containsSession(SignalProtocolAddress(it, 1)) }
+            if (strangers > 0) Log.i(TAG, "Group message: $strangers of ${acis.size} members need keys fetched first")
             val results = if (editOf == null) deps.messageSender.sendDataMessage(members, access, false, ContentHint.RESENDABLE, message, events, null, null, true)
             else deps.messageSender.sendEditMessage(members, access, false, ContentHint.RESENDABLE, message, events, null, null, true, editOf)
             val groupId = try { GroupSecretParams.deriveFromMasterKey(GroupMasterKey(masterKey)).publicParams.groupIdentifier.serialize() } catch (e: Exception) { null }
