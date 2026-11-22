@@ -210,6 +210,10 @@ class MainActivity : ComponentActivity() {
         BackHandler(enabled = stack.size > 1, onBack = pop)
         val scope = rememberCoroutineScope()
         val settings by client.settings.collectAsState()
+        // Read once for the whole activity, so coming back to the list shows it at once
+        // instead of an empty screen followed by a second redraw.
+        val threads by remember { client.threads() }.collectAsState(emptyList())
+        val archived by remember { client.archivedCount() }.collectAsState(0)
         // The message being replied to, per conversation, survives a visit to another screen.
         var reply by remember { mutableStateOf<Pair<Long, Long>?>(null) }
         var editing by remember { mutableStateOf<Pair<Long, Long>?>(null) }
@@ -262,8 +266,6 @@ class MainActivity : ComponentActivity() {
             Nav.Threads -> {
                 val connection by client.connection.collectAsState()
                 val history by client.history.collectAsState()
-                val threads by remember { client.threads() }.collectAsState(emptyList())
-                val archived by remember { client.archivedCount() }.collectAsState(0)
                 ConversationListScreen(
                     archived = archived, onArchived = { push(Nav.Archived) },
                     threads = threads.map { ThreadItem(it.id, it.title, it.snippet, if (it.time > 0) shortTime(it.time) else "", it.unread) },
@@ -374,14 +376,21 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private val lastThread = HashMap<Long, com.kongeskog.still.bridge.ThreadSummary>()
+    private val lastMessages = HashMap<Long, List<com.kongeskog.still.bridge.ChatMessage>>()
+
     @Composable
     private fun Conversation(
         client: SignalClient, id: Long, settings: Settings, replyTo: Long?, onReplyDone: () -> Unit, editing: Long?, onEditDone: () -> Unit,
         onBack: () -> Unit, onDetails: () -> Unit, onMessage: (Long) -> Unit, onPhoto: (String) -> Unit,
     ) {
-        val thread by remember(id) { client.thread(id) }.collectAsState(null)
+        // Start from what was last shown for this conversation: no blank frame on the way in,
+        // on the way back from another screen, or when loading earlier messages.
+        val thread by remember(id) { client.thread(id) }.collectAsState(lastThread[id])
         var limit by remember(id) { mutableStateOf(PAGE) }
-        val messages by remember(id, limit) { client.messages(id, limit) }.collectAsState(emptyList())
+        val messages by remember(id, limit) { client.messages(id, limit) }.collectAsState(lastMessages[id].orEmpty())
+        thread?.let { lastThread[id] = it }
+        if (messages.isNotEmpty()) lastMessages[id] = messages
         val typing by client.typing.collectAsState()
         val scope = rememberCoroutineScope()
         // Opening a conversation, or receiving into the open one, marks it read.
