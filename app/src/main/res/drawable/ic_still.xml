@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Still's icon: a round speech bubble with its tail at the lower left, in a rounded square like Mudita's own app icons. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
-    <path android:fillColor="#FFFFFF" android:pathData="M0,0h108v108h-108z" />
-    <!-- A round speech bubble with its tail at the lower left. -->
-    <path android:strokeColor="#000000" android:strokeWidth="7" android:strokeLineJoin="round" android:strokeLineCap="round"
-        android:fillColor="#00000000"
-        android:pathData="M41.3,77.2A30,30 0,1 0,28,65L26,82Z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M25.67,0H82.33A25.67,25.67 0 0 1 108,25.67V82.33A25.67,25.67 0 0 1 82.33,108H25.67A25.67,25.67 0 0 1 0,82.33V25.67A25.67,25.67 0 0 1 25.67,0Z" />
+    <path android:fillColor="#000000" android:fillType="evenOdd" android:pathData="M25.67,0H82.33A25.67,25.67 0 0 1 108,25.67V82.33A25.67,25.67 0 0 1 82.33,108H25.67A25.67,25.67 0 0 1 0,82.33V25.67A25.67,25.67 0 0 1 25.67,0ZM25.67,3.33A22.33,22.33 0 0 0 3.33,25.67V82.33A22.33,22.33 0 0 0 25.67,104.67H82.33A22.33,22.33 0 0 0 104.67,82.33V25.67A22.33,22.33 0 0 0 82.33,3.33Z" />
+    <!-- The stroke is 3.3 after scaling, the same weight as the border. -->
+    <group android:pivotX="54.6" android:pivotY="51.2" android:scaleX="0.7" android:scaleY="0.7" android:translateX="-0.6" android:translateY="2.8">
+        <path android:strokeColor="#000000" android:strokeWidth="4.76" android:strokeLineJoin="round" android:strokeLineCap="round"
+            android:fillColor="#00000000"
+            android:pathData="M41.3,77.2A30,30 0,1 0,28,65L26,82Z" />
+    </group>
 </vector>
