@@ -11,6 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,6 +35,8 @@ import com.kongeskog.still.ui.SettingsScreen
 import com.kongeskog.still.ui.SettingsUi
 import com.kongeskog.still.ui.SettingsActions
 import com.kongeskog.still.ui.SettingsPage
+import com.kongeskog.still.ui.DeviceRow
+import com.kongeskog.still.ui.ScanQrScreen
 import com.kongeskog.still.ui.DetailsScreen
 import com.kongeskog.still.ui.DetailsUi
 import com.kongeskog.still.ui.TimerScreen
@@ -77,7 +80,7 @@ import kotlinx.coroutines.withContext
 
 private enum class Page { Welcome, Link, Checks }
 
-/** Messages loaded per step of "Load earlier". */
+/** Messages loaded per step of getString(R.string.app_load_earlier). */
 private const val PAGE = 60
 private sealed interface Nav {
     data object Threads : Nav
@@ -95,6 +98,8 @@ private sealed interface Nav {
     data class Photo(val path: String) : Nav
     data object Contacts : Nav
     data class Settings(val page: SettingsPage) : Nav
+    data object Scan : Nav
+    data class LinkConfirm(val code: String) : Nav
     data object Checks : Nav
     data object Relink : Nav
     data object MakeMain : Nav
@@ -209,6 +214,11 @@ class MainActivity : ComponentActivity() {
         LaunchedEffect(top) { shownThread = (top as? Nav.Chat)?.thread; publishVisible() }
         BackHandler(enabled = stack.size > 1, onBack = pop)
         val scope = rememberCoroutineScope()
+        // Device linking outlives the settings screen: a scan returns to the list, and the
+        // confirmation has to be there when it does.
+        var linkOutcome by remember { mutableStateOf<String?>(null) }
+        var devicesVersion by remember { mutableIntStateOf(0) }
+        val startLinkScan = { push(Nav.Scan); Unit }
         val settings by client.settings.collectAsState()
         // Read once for the whole activity, so coming back to the list shows it at once
         // instead of an empty screen followed by a second redraw.
@@ -226,11 +236,11 @@ class MainActivity : ComponentActivity() {
         }
         if (call.phase != CallPhase.Idle) {
             val status = when (call.phase) {
-                CallPhase.Incoming -> "Incoming call…"
-                CallPhase.Calling -> "Calling…"
-                CallPhase.Ringing -> "Ringing…"
-                CallPhase.Connecting -> "Connecting…"
-                else -> call.connectedAt?.let { elapsed(it) } ?: "Connected"
+                CallPhase.Incoming -> getString(R.string.app_incoming_call)
+                CallPhase.Calling -> getString(R.string.app_calling)
+                CallPhase.Ringing -> getString(R.string.app_ringing)
+                CallPhase.Connecting -> getString(R.string.app_connecting)
+                else -> call.connectedAt?.let { elapsed(it) } ?: getString(R.string.app_connected)
             }
             BackHandler { }
             CallScreen(
@@ -270,7 +280,7 @@ class MainActivity : ComponentActivity() {
                     archived = archived, onArchived = { push(Nav.Archived) },
                     threads = threads.map { ThreadItem(it.id, it.title, it.snippet, if (it.time > 0) shortTime(it.time) else "", it.unread) },
                     // A connection problem matters most, then a running import, then a build that is getting old.
-                    status = connection.takeIf { it != "Connected" } ?: history ?: "Update due".takeIf { client.updateDue },
+                    status = connection.takeIf { it != "Connected" }?.let(::connectionText) ?: history ?: getString(R.string.app_update_due).takeIf { client.updateDue },
                     onOpen = { push(Nav.Chat(it)) },
                     onNew = { push(Nav.Contacts) },
                     onSettings = { push(Nav.Settings(SettingsPage.Main)) },
@@ -311,7 +321,7 @@ class MainActivity : ComponentActivity() {
             }
             is Nav.AddMember -> {
                 val contacts by remember { client.contacts() }.collectAsState(emptyList())
-                ContactsScreen(contacts.map { ContactItem(it.id, it.name, it.number) }, onBack = pop, title = "Add member") { id ->
+                ContactsScreen(contacts.map { ContactItem(it.id, it.name, it.number) }, onBack = pop, title = getString(R.string.app_add_member)) { id ->
                     client.addMember(top.thread, id)
                     pop()
                 }
@@ -339,7 +349,7 @@ class MainActivity : ComponentActivity() {
             is Nav.Rename -> {
                 val thread by remember(top.thread) { client.thread(top.thread) }.collectAsState(null)
                 thread?.let { current ->
-                    RenameScreen("Group name", current.title, onBack = pop) { name ->
+                    RenameScreen(getString(R.string.app_group_name), current.title, onBack = pop) { name ->
                         client.renameGroup(top.thread, name)
                         pop()
                     }
@@ -354,12 +364,12 @@ class MainActivity : ComponentActivity() {
                     onOpen = { id -> scope.launch { val thread = client.threadWith(id); pop(); push(Nav.Chat(thread)) } },
                 )
             }
-            is Nav.Settings -> SettingsPages(client, top.page, settings, onBack = pop, onOpen = { push(Nav.Settings(it)) }, onChecks = { push(Nav.Checks) }, onRelink = { push(Nav.Relink) }, onMakeMain = { push(Nav.MakeMain) })
+            is Nav.Settings -> SettingsPages(client, top.page, settings, onBack = pop, onOpen = { push(Nav.Settings(it)) }, onChecks = { push(Nav.Checks) }, onRelink = { push(Nav.Relink) }, onMakeMain = { push(Nav.MakeMain) }, onScan = startLinkScan, devicesVersion = devicesVersion, linkOutcome = linkOutcome)
             Nav.MakeMain -> {
                 var busy by remember { mutableStateOf(false) }
                 var error by remember { mutableStateOf<String?>(null) }
                 ConfirmScreen(
-                    "Main device", "Signal on this phone will be signed out. Still takes its place.", "Make Still the main device",
+                    getString(R.string.app_main_device), getString(R.string.app_signal_on_this_phone_will_be_signed_), getString(R.string.app_make_still_the_main_device),
                     busy, error, onBack = pop,
                 ) {
                     busy = true
@@ -373,6 +383,36 @@ class MainActivity : ComponentActivity() {
             // Linking again is how history is fetched: Signal only offers the transfer to a device as it links.
             Nav.Relink -> Linking(client, onBack = { client.cancelLinking(); pop() }, onLinked = ::restart)
             Nav.Checks -> Checks(onBack = pop)
+            Nav.Scan -> ScanQrScreen(
+                onBack = pop,
+                onRead = { text -> pop(); push(Nav.LinkConfirm(text)) },
+                onUnavailable = {
+                    android.widget.Toast.makeText(this, getString(com.kongeskog.still.ui.R.string.scan_unavailable), android.widget.Toast.LENGTH_LONG).show()
+                    pop()
+                },
+            )
+            is Nav.LinkConfirm -> {
+                var busy by remember { mutableStateOf(false) }
+                var error by remember { mutableStateOf<String?>(null) }
+                ConfirmScreen(
+                    getString(R.string.app_link_device), getString(R.string.app_link_warning), getString(R.string.app_link),
+                    busy, error, onBack = pop,
+                ) {
+                    val code = top.code
+                    busy = true
+                    scope.launch {
+                        val outcome = client.linkDevice(code)
+                        busy = false
+                        if (outcome == null) {
+                            linkOutcome = getString(R.string.app_device_linked)
+                            devicesVersion++
+                            pop()
+                        } else {
+                            error = outcome
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -397,8 +437,8 @@ class MainActivity : ComponentActivity() {
         LaunchedEffect(id, messages.size) { client.markRead(id) }
         val current = thread ?: return
         val label = when {
-            id in typing -> "typing…"
-            current.expireTimer > 0 -> "Signal · ${duration(current.expireTimer)}"
+            id in typing -> getString(R.string.app_typing)
+            current.expireTimer > 0 -> getString(R.string.signal_timer, duration(current.expireTimer))
             else -> "Signal"
         }
         ConversationScreen(
@@ -415,13 +455,13 @@ class MainActivity : ComponentActivity() {
                         items += BubbleItem(-m.id, false, null, date, "", system = true)
                     }
                     if (m.isEvent) {
-                        items += BubbleItem(m.id, false, null, listOfNotNull(m.sender, m.body).joinToString(": ").takeIf { m.body.startsWith("Group") } ?: m.body, "", system = true)
+                        items += BubbleItem(m.id, false, null, listOfNotNull(m.sender, m.body).joinToString(": ").takeIf { m.body.startsWith(getString(R.string.app_group)) } ?: m.body, "", system = true)
                         continue
                     }
                     val failed = m.outgoing && m.status == MessageStatus.Failed
                     items += BubbleItem(
                         m.id, m.outgoing, m.sender, m.body,
-                        footer = if (failed) "Not sent. Tap to retry" else (if (m.edited) "Edited · " else "") + timeOfDay(m.sentAt) + if (m.outgoing) mark(m.status) else "",
+                        footer = if (failed) getString(R.string.app_not_sent_tap_to_retry) else (if (m.edited) getString(R.string.app_edited) else "") + timeOfDay(m.sentAt) + if (m.outgoing) mark(m.status) else "",
                         failed = failed, quote = m.quote, reactions = m.reactions,
                         attachments = m.attachments.map {
                             val waiting = if (it.path == null) " · tap to load" else ""
@@ -499,8 +539,8 @@ class MainActivity : ComponentActivity() {
     private fun timeOfDay(time: Long): String = android.text.format.DateFormat.getTimeFormat(this).format(Date(time))
 
     private fun dayLabel(time: Long): String = when {
-        DateUtils.isToday(time) -> "Today"
-        DateUtils.isToday(time + DateUtils.DAY_IN_MILLIS) -> "Yesterday"
+        DateUtils.isToday(time) -> getString(R.string.app_today)
+        DateUtils.isToday(time + DateUtils.DAY_IN_MILLIS) -> getString(R.string.app_yesterday)
         else -> SimpleDateFormat("EEE d MMM", Locale.getDefault()).format(Date(time))
     }
 
@@ -522,11 +562,11 @@ class MainActivity : ComponentActivity() {
             return
         }
         val status = when (message.status) {
-            MessageStatus.Sending -> "Sending"
-            MessageStatus.Sent -> "Sent"
-            MessageStatus.Delivered -> "Delivered"
-            MessageStatus.Read -> "Read"
-            MessageStatus.Failed -> "Not sent"
+            MessageStatus.Sending -> getString(R.string.app_sending)
+            MessageStatus.Sent -> getString(R.string.app_sent)
+            MessageStatus.Delivered -> getString(R.string.app_delivered)
+            MessageStatus.Read -> getString(R.string.app_read)
+            MessageStatus.Failed -> getString(R.string.app_not_sent)
         }
         MessageScreen(
             MessageActionsUi(
@@ -541,7 +581,7 @@ class MainActivity : ComponentActivity() {
             onReply = onReply,
             onEdit = onEdit,
             onCopy = {
-                getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("Message", message.body))
+                getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText(getString(R.string.app_message), message.body))
                 onBack()
             },
             onDeleteForMe = { client.deleteForMe(message.id); onBack() },
@@ -561,7 +601,7 @@ class MainActivity : ComponentActivity() {
         DetailsScreen(
             DetailsUi(
                 title = current.title,
-                label = if (current.isGroup) "Group · ${members.size} members" else "Signal",
+                label = if (current.isGroup) getString(R.string.group_members, members.size) else "Signal",
                 isGroup = current.isGroup,
                 timer = duration(current.expireTimer),
                 canEdit = !current.isGroup || current.canEdit,
@@ -585,28 +625,59 @@ class MainActivity : ComponentActivity() {
     private fun SettingsPages(
         client: SignalClient, page: SettingsPage, settings: Settings,
         onBack: () -> Unit, onOpen: (SettingsPage) -> Unit, onChecks: () -> Unit, onRelink: () -> Unit, onMakeMain: () -> Unit,
+        onScan: () -> Unit, devicesVersion: Int, linkOutcome: String?,
     ) {
         val account by client.account.collectAsState()
         val connection by client.connection.collectAsState()
-        val actions = remember(client) {
-            object : SettingsActions {
-                override fun readReceipts(on: Boolean) = client.update { it.copy(readReceipts = on) }
-                override fun typingIndicators(on: Boolean) = client.update { it.copy(typingIndicators = on) }
-                override fun notifications(on: Boolean) = client.update { it.copy(notifications = on) }
-                override fun preview(choice: Int) = client.update { it.copy(preview = Preview.entries[choice]) }
-                override fun enterSends(on: Boolean) = client.update { it.copy(enterSends = on) }
-                override fun largeText(on: Boolean) = client.update { it.copy(largeText = on) }
-                override fun checks() = onChecks()
-                override fun transferHistory() = onRelink()
-                override fun makeMain() = onMakeMain()
+        val scope = rememberCoroutineScope()
+        var devices by remember { mutableStateOf<List<DeviceRow>?>(null) }
+        var deviceStatus by remember { mutableStateOf<String?>(null) }
+        var deviceBusy by remember { mutableStateOf(false) }
+
+        fun refreshDevices() {
+            scope.launch {
+                devices = client.linkedDevices()?.map {
+                    DeviceRow(it.id, it.name, android.text.format.DateFormat.getMediumDateFormat(this@MainActivity).format(java.util.Date(it.lastSeen)))
+                }
             }
         }
+
+        LaunchedEffect(page, devicesVersion) {
+            if (page == SettingsPage.Devices) {
+                linkOutcome?.let { deviceStatus = it }
+                refreshDevices()
+            }
+        }
+
+        val actions = object : SettingsActions {
+            override fun readReceipts(on: Boolean) = client.update { it.copy(readReceipts = on) }
+            override fun typingIndicators(on: Boolean) = client.update { it.copy(typingIndicators = on) }
+            override fun notifications(on: Boolean) = client.update { it.copy(notifications = on) }
+            override fun preview(choice: Int) = client.update { it.copy(preview = Preview.entries[choice]) }
+            override fun enterSends(on: Boolean) = client.update { it.copy(enterSends = on) }
+            override fun largeText(on: Boolean) = client.update { it.copy(largeText = on) }
+            override fun checks() = onChecks()
+            override fun transferHistory() = onRelink()
+            override fun makeMain() = onMakeMain()
+            override fun scanDevice() = onScan()
+            override fun refreshDevices() = refreshDevices()
+            override fun removeDevice(id: Int) {
+                scope.launch {
+                    deviceBusy = true
+                    deviceStatus = if (client.removeLinkedDevice(id)) getString(R.string.app_device_removed) else getString(R.string.app_could_not_remove_the_device)
+                    deviceBusy = false
+                    refreshDevices()
+                }
+            }
+        }
+
         SettingsScreen(
             page,
             SettingsUi(
-                number = account?.number ?: "Unknown", device = if (account?.deviceId == 1) "Main device" else "Linked device ${account?.deviceId ?: 0}", connection = connection,
+                number = account?.number ?: getString(R.string.app_unknown), device = if (account?.deviceId == 1) getString(R.string.app_main_device) else getString(R.string.linked_device_n, account?.deviceId ?: 0), connection = connectionText(connection),
                 isMain = account?.deviceId == 1,
                 updateDue = client.updateDue, librariesUpdated = client.librariesUpdated,
+                devices = devices, deviceStatus = deviceStatus, deviceBusy = deviceBusy,
                 version = packageManager.getPackageInfo(packageName, 0).versionName ?: "",
                 readReceipts = settings.readReceipts, typingIndicators = settings.typingIndicators,
                 notifications = settings.notifications, preview = settings.preview.ordinal,
@@ -616,8 +687,16 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    /** The client reports connection states in English; only the screen is translated. */
+    private fun connectionText(state: String): String = when (state) {
+        "Connected" -> getString(R.string.app_connected)
+        "Connecting…" -> getString(R.string.app_connecting)
+        "Not connected" -> getString(R.string.app_not_connected)
+        else -> state
+    }
+
     private fun duration(seconds: Int): String = when {
-        seconds == 0 -> "Off"
+        seconds == 0 -> getString(R.string.app_off)
         seconds % 604800 == 0 -> "${seconds / 604800} wk"
         seconds % 86400 == 0 -> "${seconds / 86400} d"
         seconds % 3600 == 0 -> "${seconds / 3600} h"

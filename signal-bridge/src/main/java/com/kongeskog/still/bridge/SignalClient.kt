@@ -159,6 +159,34 @@ class SignalClient private constructor(private val context: Context) {
     }
 
     /**
+     * Adds the device named by a scanned `sgnl://linkdevice` code, from this phone as the
+     * account's main device. Returns null on success, otherwise a reason to show.
+     */
+    suspend fun linkDevice(code: String): String? = withContext(Dispatchers.IO) {
+        val linker = deps?.let { DeviceLinker(it, store) } ?: return@withContext "Not connected."
+        when (val outcome = linker.add(code)) {
+            DeviceLinker.Outcome.Linked -> null
+            DeviceLinker.Outcome.BadCode -> "That is not a Signal link code."
+            DeviceLinker.Outcome.LimitReached -> "Signal has no room for another device."
+            DeviceLinker.Outcome.NotPrimary -> "Only the main device can link another device."
+            is DeviceLinker.Outcome.Failed -> "Linking failed (${outcome.why})."
+        }
+    }
+
+    /** The other devices on the account, or null when they could not be read. */
+    suspend fun linkedDevices(): List<LinkedDevice>? = withContext(Dispatchers.IO) {
+        deps?.let { DeviceLinker(it, store).devices() }
+    }
+
+    /** Removes one of them. False when the server refused or could not be asked. */
+    suspend fun removeLinkedDevice(deviceId: Int): Boolean = withContext(Dispatchers.IO) {
+        deps?.let { DeviceLinker(it, store).remove(deviceId) } == true
+    }
+
+    /** True when this phone is the account's main device and may add or remove others. */
+    val isMainDevice: Boolean get() = store.deviceId == 1
+
+    /**
      * True once this build is old enough that Signal may soon stop accepting it. Shown well
      * ahead of the cut-off, because after it no messages arrive until Still is updated.
      */

@@ -49,6 +49,9 @@ class DemoActivity : ComponentActivity() {
             override fun checks() = Unit
             override fun transferHistory() = Unit
             override fun makeMain() = Unit
+            override fun scanDevice() = Unit
+            override fun removeDevice(id: Int) = Unit
+            override fun refreshDevices() = Unit
         }
         val bubbles = listOf(
             BubbleItem(-1, false, null, "Today", "", system = true),

@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -123,7 +124,7 @@ fun Screen(
     Column(Modifier.fillMaxSize().background(Color.White)) {
         Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             if (onBack != null) {
-                BarAction(Icons.Back, "Back", onBack)
+                BarAction(Icons.Back, stringResource(R.string.back), onBack)
                 Spacer(Modifier.width(4.dp))
             } else {
                 Spacer(Modifier.width(12.dp))
@@ -213,7 +214,7 @@ fun SwitchRow(title: String, checked: Boolean, onChange: (Boolean) -> Unit) =
 /** One of several exclusive choices; the chosen one carries a tick. */
 @Composable
 fun ChoiceRow(title: String, selected: Boolean, onClick: () -> Unit) =
-    ListRow(title, bold = selected, onClick = onClick) { if (selected) Icon(Icons.Check, "Selected", Modifier.size(26.dp)) }
+    ListRow(title, bold = selected, onClick = onClick) { if (selected) Icon(Icons.Check, stringResource(R.string.selected), Modifier.size(26.dp)) }
 
 @Composable
 fun PrimaryButton(text: String, modifier: Modifier = Modifier, enabled: Boolean = true, onClick: () -> Unit) {

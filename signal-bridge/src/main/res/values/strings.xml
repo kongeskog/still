@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="channel_calls">Calls</string>
+    <string name="channel_connection">Connection</string>
+    <string name="channel_connection_description">Shown while Still is connected to Signal</string>
+    <string name="channel_messages">Messages</string>
+    <string name="incoming_call">Incoming call</string>
+</resources>

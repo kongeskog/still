@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="channel_calls">Anrufe</string>
+    <string name="channel_connection">Verbindung</string>
+    <string name="channel_connection_description">Wird angezeigt, solange Still mit Signal verbunden ist</string>
+    <string name="channel_messages">Nachrichten</string>
+    <string name="incoming_call">Eingehender Anruf</string>
+</resources>
