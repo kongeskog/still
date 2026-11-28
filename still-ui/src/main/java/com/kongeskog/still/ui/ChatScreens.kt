@@ -38,6 +38,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -80,16 +81,16 @@ fun ConversationListScreen(
     /** Set when this screen is itself the archive. */
     onBack: (() -> Unit)? = null,
 ) {
-    Screen(if (onBack != null) "Archived" else "Still", onBack, label = status, actions = {
+    Screen(if (onBack != null) stringResource(R.string.archived) else "Still", onBack, label = status, actions = {
         if (onBack == null) {
-            BarAction(Icons.Search, "Search", onSearch)
-            BarAction(Icons.Settings, "Settings", onSettings)
-            BarPrimary(Icons.Plus, "New message", onNew)
+            BarAction(Icons.Search, stringResource(R.string.search), onSearch)
+            BarAction(Icons.Settings, stringResource(R.string.settings), onSettings)
+            BarPrimary(Icons.Plus, stringResource(R.string.new_message), onNew)
         }
     }) {
         if (threads.isEmpty() && archived == 0) {
             // A new account's first screen: say why it is empty and where to start.
-            TextMMD("No conversations yet. Tap + to write to someone.", Modifier.padding(16.dp), style = MaterialTheme.typography.bodyLarge)
+            TextMMD(stringResource(R.string.no_conversations_yet_tap_to_write_to_som), Modifier.padding(16.dp), style = MaterialTheme.typography.bodyLarge)
         }
         LazyColumnMMD(Modifier.fillMaxSize(), scrollStep = 0, isScrollbarVisible = false) {
             items(threads.size, key = { threads[it].id }) { i ->
@@ -116,7 +117,7 @@ fun ConversationListScreen(
                 }
                 DottedDivider()
             }
-            if (archived > 0) item(key = "archived") { NavRow("Archived", "$archived", onArchived) }
+            if (archived > 0) item(key = "archived") { NavRow(stringResource(R.string.archived), "$archived", onArchived) }
         }
     }
 }
@@ -192,8 +193,8 @@ fun ConversationScreen(
     }
 
     Screen(title, onBack, label, onTitle = onDetails, actions = {
-        if (onCall != null) BarAction(Icons.Phone, "Call", onCall)
-        BarAction(Icons.More, "Details", onDetails)
+        if (onCall != null) BarAction(Icons.Phone, stringResource(R.string.call), onCall)
+        BarAction(Icons.More, stringResource(R.string.details), onDetails)
     }) {
         if (messages.isEmpty()) {
             Spacer(Modifier.weight(1f).fillMaxWidth().then(tapToDismiss))
@@ -215,7 +216,7 @@ fun ConversationScreen(
                 if (onLoadEarlier != null) {
                     item(key = "earlier") {
                         Box(Modifier.fillMaxWidth().height(48.dp).clickable(onClick = onLoadEarlier), contentAlignment = Alignment.Center) {
-                            TextMMD("Load earlier", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                            TextMMD(stringResource(R.string.load_earlier), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -225,23 +226,23 @@ fun ConversationScreen(
         HorizontalDividerMMD()
         if (onSend == null) {
             Box(Modifier.fillMaxWidth().heightIn(min = 60.dp).padding(horizontal = 16.dp), contentAlignment = Alignment.CenterStart) {
-                TextMMD("Sending is off in Settings", style = MaterialTheme.typography.bodyMedium)
+                TextMMD(stringResource(R.string.sending_is_off_in_settings), style = MaterialTheme.typography.bodyMedium)
             }
         } else {
-            val banner = if (editing != null) "Editing" else replyingTo
+            val banner = if (editing != null) stringResource(R.string.editing) else replyingTo
             if (banner != null) {
                 Row(Modifier.fillMaxWidth().height(48.dp).padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.width(2.dp).height(28.dp).background(Color.Black))
                     TextMMD(banner, Modifier.weight(1f).padding(start = 8.dp), style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    BarAction(Icons.Close, "Cancel", if (editing != null) onCancelEdit else onCancelReply)
+                    BarAction(Icons.Close, stringResource(R.string.cancel), if (editing != null) onCancelEdit else onCancelReply)
                 }
             }
             if (recording != null) {
                 // Recording takes the composer's place; only the digits change while it runs.
                 Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).padding(start = 16.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    TextMMD("Recording ${recording.elapsed}", Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-                    SquareButton(Icons.Close, "Discard", onRecordCancel)
-                    SquareButton(Icons.Send, "Send voice note", onRecordSend)
+                    TextMMD(stringResource(R.string.recording, recording.elapsed), Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+                    SquareButton(Icons.Close, stringResource(R.string.discard), onRecordCancel)
+                    SquareButton(Icons.Send, stringResource(R.string.send_voice_note), onRecordSend)
                 }
             } else {
                 Composer(title, editing, enterSends, onTyping, onAttach, onRecord, onSend)
@@ -338,7 +339,7 @@ private fun Composer(
         }
     }
     Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).padding(start = 4.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        BarAction(Icons.Attach, "Attach", onAttach)
+        BarAction(Icons.Attach, stringResource(R.string.attach), onAttach)
         // Pulled left: the field's own 16dp inset on top of the button's margin left the cursor adrift.
         Box(Modifier.weight(1f).offset(x = (-10).dp), contentAlignment = Alignment.CenterStart) {
             TextFieldMMD(
@@ -365,7 +366,7 @@ private fun Composer(
             if (justOpened && !focused && draft.isEmpty()) DrawnCursor()
         }
         // An empty field offers a voice note instead, as Signal does.
-        if (draft.isEmpty()) SquareButton(Icons.Mic, "Record voice note", onRecord) else SquareButton(Icons.Send, "Send", send)
+        if (draft.isEmpty()) SquareButton(Icons.Mic, stringResource(R.string.record_voice_note), onRecord) else SquareButton(Icons.Send, stringResource(R.string.send), send)
     }
 }
 
@@ -378,7 +379,7 @@ private fun BubbleImage(path: String, onClick: () -> Unit) {
         Box(Modifier.size(200.dp, 120.dp))
     } else {
         Image(
-            bitmap, "Photo",
+            bitmap, stringResource(R.string.photo),
             Modifier.padding(bottom = 4.dp).widthIn(max = 260.dp).heightIn(max = 320.dp).clickable(onClick = onClick),
             contentScale = ContentScale.Fit,
         )
@@ -400,8 +401,8 @@ fun decode(path: String, maxSide: Int): ImageBitmap? = try {
 @Composable
 fun PhotoScreen(path: String, onBack: () -> Unit) {
     val image by produceState<ImageBitmap?>(null, path) { value = withContext(Dispatchers.IO) { decode(path, 1200) } }
-    Screen("Photo", onBack) {
-        image?.let { Image(it, "Photo", Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
+    Screen(stringResource(R.string.photo), onBack) {
+        image?.let { Image(it, stringResource(R.string.photo), Modifier.fillMaxSize(), contentScale = ContentScale.Fit) }
     }
 }
 
@@ -437,7 +438,7 @@ fun MessageScreen(
     onDeleteForMe: () -> Unit,
     onDeleteForEveryone: () -> Unit,
 ) {
-    Screen("Message", onBack, label = listOfNotNull(state.sent, state.status).joinToString(" · ")) {
+    Screen(stringResource(R.string.message), onBack, label = listOfNotNull(state.sent, state.status).joinToString(" · ")) {
         TextMMD(state.body, Modifier.padding(16.dp), style = MaterialTheme.typography.bodyLarge, maxLines = 4, overflow = TextOverflow.Ellipsis)
         HorizontalDividerMMD(thickness = 1.dp)
         if (state.canWrite) {
@@ -449,12 +450,12 @@ fun MessageScreen(
                 }
             }
             DottedDivider()
-            ListRow("Reply", onClick = onReply) { Icon(Icons.Reply, null, Modifier.size(24.dp)) }
+            ListRow(stringResource(R.string.reply), onClick = onReply) { Icon(Icons.Reply, null, Modifier.size(24.dp)) }
         }
-        if (state.canEdit) ListRow("Edit", onClick = onEdit)
-        ListRow("Copy", onClick = onCopy)
-        ListRow("Delete for me", onClick = onDeleteForMe)
-        if (state.own && state.canWrite) ListRow("Delete for everyone", onClick = onDeleteForEveryone)
+        if (state.canEdit) ListRow(stringResource(R.string.edit), onClick = onEdit)
+        ListRow(stringResource(R.string.copy), onClick = onCopy)
+        ListRow(stringResource(R.string.delete_for_me), onClick = onDeleteForMe)
+        if (state.own && state.canWrite) ListRow(stringResource(R.string.delete_for_everyone), onClick = onDeleteForEveryone)
     }
 }
 
@@ -480,17 +481,17 @@ fun CallScreen(state: CallUi, onAnswer: () -> Unit, onEnd: () -> Unit, onMute: (
         Spacer(Modifier.weight(1f))
         if (state.incoming) {
             Row(Modifier.padding(bottom = 40.dp), verticalAlignment = Alignment.Top) {
-                CallButton(Icons.Phone, "Decline", filled = false, lowered = true, onClick = onEnd)
+                CallButton(Icons.Phone, stringResource(R.string.decline), filled = false, lowered = true, onClick = onEnd)
                 Spacer(Modifier.width(104.dp))
-                CallButton(Icons.Phone, "Accept", filled = true, onClick = onAnswer)
+                CallButton(Icons.Phone, stringResource(R.string.accept), filled = true, onClick = onAnswer)
             }
         } else {
             Row(Modifier.padding(bottom = 40.dp), verticalAlignment = Alignment.Top) {
-                CallButton(Icons.MicOff, "Mute", filled = state.muted, outlined = false) { onMute(!state.muted) }
+                CallButton(Icons.MicOff, stringResource(R.string.mute), filled = state.muted, outlined = false) { onMute(!state.muted) }
                 Spacer(Modifier.width(72.dp))
-                CallButton(Icons.Speaker, "Speaker", filled = state.speaker, outlined = false) { onSpeaker(!state.speaker) }
+                CallButton(Icons.Speaker, stringResource(R.string.speaker), filled = state.speaker, outlined = false) { onSpeaker(!state.speaker) }
             }
-            Box(Modifier.padding(bottom = 32.dp)) { CallButton(Icons.Phone, "End call", filled = false, lowered = true, onClick = onEnd) }
+            Box(Modifier.padding(bottom = 32.dp)) { CallButton(Icons.Phone, stringResource(R.string.end_call), filled = false, lowered = true, onClick = onEnd) }
         }
     }
 }

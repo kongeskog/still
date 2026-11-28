@@ -24,5 +24,9 @@ dependencies {
     api("com.mudita:MMD:1.0.2")
     api("androidx.activity:activity-compose:1.10.1")
     implementation("com.google.zxing:core:3.5.3")
+    // The live camera picture the QR scanner reads, as Calm QR uses it.
+    implementation("androidx.camera:camera-camera2:1.4.1")
+    implementation("androidx.camera:camera-lifecycle:1.4.1")
+    implementation("androidx.camera:camera-view:1.4.1")
     implementation("androidx.compose.material:material-icons-extended:1.7.3")
 }

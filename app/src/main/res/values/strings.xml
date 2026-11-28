@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_add_member">Add member</string>
+    <string name="app_calling">Calling…</string>
+    <string name="app_connected">Connected</string>
+    <string name="app_connecting">Connecting…</string>
+    <string name="app_could_not_remove_the_device">Could not remove the device.</string>
+    <string name="app_delivered">Delivered</string>
+    <string name="app_device_removed">Device removed.</string>
+    <string name="app_edited">Edited · </string>
+    <string name="app_group">Group</string>
+    <string name="app_group_name">Group name</string>
+    <string name="app_incoming_call">Incoming call…</string>
+    <string name="app_load_earlier">Load earlier</string>
+    <string name="app_main_device">Main device</string>
+    <string name="app_make_still_the_main_device">Make Still the main device</string>
+    <string name="app_message">Message</string>
+    <string name="app_not_sent">Not sent</string>
+    <string name="app_not_sent_tap_to_retry">Not sent. Tap to retry</string>
+    <string name="app_off">Off</string>
+    <string name="app_read">Read</string>
+    <string name="app_ringing">Ringing…</string>
+    <string name="app_scan_the_signal_desktop_link_code">Scan the Signal Desktop link code</string>
+    <string name="app_sending">Sending</string>
+    <string name="app_sent">Sent</string>
+    <string name="app_signal_on_this_phone_will_be_signed_">Signal on this phone will be signed out. Still takes its place.</string>
+    <string name="app_today">Today</string>
+    <string name="app_typing">typing…</string>
+    <string name="app_unknown">Unknown</string>
+    <string name="app_update_due">Update due</string>
+    <string name="app_yesterday">Yesterday</string>
+    <string name="group_members">Group · %1$d members</string>
+    <string name="linked_device_n">Linked device %1$d</string>
+    <string name="signal_timer">Signal · %1$s</string>
+    <string name="tap_to_load"> · tap to load</string>
+    <string name="app_not_connected">Not connected</string>
+    <string name="app_device_linked">Device linked.</string>
+    <string name="app_link_device">Link this device?</string>
+    <string name="app_link_warning">It will read every message and can write as you. Only link a device you hold.</string>
+    <string name="app_link">Link</string>
+</resources>

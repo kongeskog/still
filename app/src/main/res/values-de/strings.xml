@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_add_member">Mitglied hinzufügen</string>
+    <string name="app_calling">Anrufen…</string>
+    <string name="app_connected">Verbunden</string>
+    <string name="app_connecting">Verbinde…</string>
+    <string name="app_could_not_remove_the_device">Gerät konnte nicht entfernt werden.</string>
+    <string name="app_delivered">Zugestellt</string>
+    <string name="app_device_removed">Gerät entfernt.</string>
+    <string name="app_edited">Bearbeitet · </string>
+    <string name="app_group">Gruppe</string>
+    <string name="app_group_name">Gruppenname</string>
+    <string name="app_incoming_call">Eingehender Anruf…</string>
+    <string name="app_load_earlier">Ältere laden</string>
+    <string name="app_main_device">Hauptgerät</string>
+    <string name="app_make_still_the_main_device">Still als Hauptgerät festlegen</string>
+    <string name="app_message">Nachricht</string>
+    <string name="app_not_sent">Nicht gesendet</string>
+    <string name="app_not_sent_tap_to_retry">Nicht gesendet. Tippen zum Wiederholen</string>
+    <string name="app_off">Aus</string>
+    <string name="app_read">Gelesen</string>
+    <string name="app_ringing">Klingelt…</string>
+    <string name="app_scan_the_signal_desktop_link_code">Signal-Desktop-Link-Code scannen</string>
+    <string name="app_sending">Wird gesendet</string>
+    <string name="app_sent">Gesendet</string>
+    <string name="app_signal_on_this_phone_will_be_signed_">Signal auf diesem Telefon wird abgemeldet. Still tritt an seine Stelle.</string>
+    <string name="app_today">Heute</string>
+    <string name="app_typing">schreibt…</string>
+    <string name="app_unknown">Unbekannt</string>
+    <string name="app_update_due">Update fällig</string>
+    <string name="app_yesterday">Gestern</string>
+    <string name="group_members">Gruppe · %1$d Mitglieder</string>
+    <string name="linked_device_n">Verknüpftes Gerät %1$d</string>
+    <string name="signal_timer">Signal · %1$s</string>
+    <string name="tap_to_load"> · tippen zum Laden</string>
+    <string name="app_not_connected">Nicht verbunden</string>
+    <string name="app_device_linked">Gerät gekoppelt.</string>
+    <string name="app_link_device">Dieses Gerät koppeln?</string>
+    <string name="app_link_warning">Es liest alle Nachrichten und kann in deinem Namen schreiben. Koppele nur ein Gerät, das dir gehört.</string>
+    <string name="app_link">Koppeln</string>
+</resources>

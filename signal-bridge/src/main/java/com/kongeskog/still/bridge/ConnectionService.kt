@@ -84,12 +84,12 @@ internal object Notifier {
     fun createChannels(context: Context) {
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(
-            NotificationChannel(CONNECTION_CHANNEL, "Connection", NotificationManager.IMPORTANCE_MIN).apply {
-                description = "Shown while Still is connected to Signal"
+            NotificationChannel(CONNECTION_CHANNEL, context.getString(R.string.channel_connection), NotificationManager.IMPORTANCE_MIN).apply {
+                description = context.getString(R.string.channel_connection_description)
                 setShowBadge(false)
             },
         )
-        manager.createNotificationChannel(NotificationChannel(MESSAGE_CHANNEL, "Messages", NotificationManager.IMPORTANCE_HIGH))
+        manager.createNotificationChannel(NotificationChannel(MESSAGE_CHANNEL, context.getString(R.string.channel_messages), NotificationManager.IMPORTANCE_HIGH))
     }
 
     fun connection(context: Context, state: String): Notification =
@@ -130,14 +130,14 @@ internal object Notifier {
     /** Rings through the lock screen: the notification opens the call screen full-screen. */
     fun incomingCall(context: Context, threadId: Long, name: String) {
         val manager = context.getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(NotificationChannel(CALL_CHANNEL, "Calls", NotificationManager.IMPORTANCE_HIGH).apply { setSound(null, null) })
+        manager.createNotificationChannel(NotificationChannel(CALL_CHANNEL, context.getString(R.string.channel_calls), NotificationManager.IMPORTANCE_HIGH).apply { setSound(null, null) })
         val intent = open(context, threadId)
         manager.notify(
             CALL_ID,
             Notification.Builder(context, CALL_CHANNEL)
                 .setSmallIcon(R.drawable.ic_stat_still)
                 .setContentTitle(name)
-                .setContentText("Incoming call")
+                .setContentText(context.getString(R.string.incoming_call))
                 .setCategory(Notification.CATEGORY_CALL)
                 .setOngoing(true)
                 .setContentIntent(intent)

@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,16 +35,16 @@ fun WelcomeScreen(onLink: () -> Unit) {
             Modifier.weight(1f).fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            TextMMD("Signal messages on your Kompakt.", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            TextMMD(stringResource(R.string.signal_messages_on_your_kompakt), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             TextMMD(
-                "Still joins your Signal account as a linked device, like Signal Desktop. Your Signal app keeps working.",
+                stringResource(R.string.still_joins_your_signal_account_as_a_lin),
                 style = MaterialTheme.typography.bodyLarge,
             )
-            TextMMD("No Signal account yet? Create one in the Signal app first.", style = MaterialTheme.typography.bodyLarge)
-            TextMMD("Still is not made by Signal or Mudita.", style = MaterialTheme.typography.bodyMedium)
+            TextMMD(stringResource(R.string.no_signal_account_yet_create_one_in_the_), style = MaterialTheme.typography.bodyLarge)
+            TextMMD(stringResource(R.string.still_is_not_made_by_signal_or_mudita), style = MaterialTheme.typography.bodyMedium)
         }
         Column(Modifier.padding(16.dp)) {
-            PrimaryButton("Link to Signal", Modifier.fillMaxWidth(), onClick = onLink)
+            PrimaryButton(stringResource(R.string.link_to_signal), Modifier.fillMaxWidth(), onClick = onLink)
         }
     }
 }
@@ -57,32 +58,32 @@ sealed interface LinkUi {
 
 @Composable
 fun LinkScreen(state: LinkUi, onBack: () -> Unit, onRetry: () -> Unit) {
-    Screen("Link to Signal", onBack) {
+    Screen(stringResource(R.string.link_to_signal), onBack) {
         Column(
             Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             when (state) {
-                LinkUi.Connecting -> Note("Connecting to Signal…")
-                LinkUi.Registering -> Note("Linked. Setting up…")
+                LinkUi.Connecting -> Note(stringResource(R.string.connecting_to_signal))
+                LinkUi.Registering -> Note(stringResource(R.string.linked_setting_up))
                 is LinkUi.Failed -> {
-                    Note("Linking did not finish.")
+                    Note(stringResource(R.string.linking_did_not_finish))
                     TextMMD(state.reason, Modifier.fillMaxWidth(), style = MaterialTheme.typography.bodyMedium)
                 }
                 is LinkUi.Code -> {
                     QrCode(state.url, Modifier.size(200.dp))
-                    Step("1", "In Signal: Settings > Linked devices > Link a new device.")
-                    Step("2", "Scan this code. Signal on this phone? Photograph the code with another phone and scan that.")
-                    Step("3", "Choose Transfer message history.")
+                    Step("1", stringResource(R.string.in_signal_settings_linked_devices_link_a))
+                    Step("2", stringResource(R.string.scan_this_code_signal_on_this_phone_phot))
+                    Step("3", stringResource(R.string.choose_transfer_message_history))
                 }
             }
         }
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
             when (state) {
-                is LinkUi.Failed -> PrimaryButton("Try again", Modifier.fillMaxWidth(), onClick = onRetry)
+                is LinkUi.Failed -> PrimaryButton(stringResource(R.string.try_again), Modifier.fillMaxWidth(), onClick = onRetry)
                 // A code lasts 90 seconds; a fresh one gives the full time for the photo.
-                is LinkUi.Code -> SecondaryButton("New code", Modifier.fillMaxWidth(), onClick = onRetry)
+                is LinkUi.Code -> SecondaryButton(stringResource(R.string.new_code), Modifier.fillMaxWidth(), onClick = onRetry)
                 else -> Spacer(Modifier.size(56.dp))
             }
         }
